@@ -2,7 +2,13 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4f5ee3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="雅思陪练">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>雅思陪练 · 冲 7.5</title>
 <style>
   :root {
@@ -27,25 +33,25 @@
     background: var(--bg);
     color: var(--ink);
     line-height: 1.6;
-    padding: 24px 16px 80px;
+    padding: 20px 14px calc(76px + env(safe-area-inset-bottom));
   }
   .wrap { max-width: 860px; margin: 0 auto; }
 
-  header { margin-bottom: 20px; }
-  .topline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; }
-  h1 { font-size: 22px; font-weight: 700; }
+  header { margin-bottom: 16px; }
+  .topline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+  h1 { font-size: 21px; font-weight: 700; }
   .datechip { color: var(--sub); font-size: 14px; }
   .countdown {
     margin-left: auto; background: var(--accent); color: #fff;
-    padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    padding: 5px 13px; border-radius: 999px; font-size: 14px; font-weight: 600;
     white-space: nowrap;
   }
-  .goalbar { color: var(--sub); font-size: 13px; margin-top: 6px; }
+  .goalbar { color: var(--sub); font-size: 12.5px; margin-top: 6px; }
   .goalbar b { color: var(--ink); }
 
   .card {
     background: var(--card); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px;
+    border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px;
   }
   .card h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
   .card .hint { font-size: 13px; color: var(--sub); margin-bottom: 12px; }
@@ -61,35 +67,39 @@
   }
 
   .task {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 11px 10px; border-radius: 10px; cursor: pointer;
+    display: flex; align-items: flex-start; gap: 11px;
+    padding: 11px 8px; border-radius: 10px; cursor: pointer;
     transition: background .12s;
   }
   .task:hover { background: #fafbff; }
-  .task input { margin-top: 5px; width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; flex: none; }
-  .task .time { flex: none; width: 96px; font-size: 13px; color: var(--accent); font-weight: 600; padding-top: 2px; }
+  .task input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; }
+  .task .time { flex: none; width: 92px; font-size: 12.5px; color: var(--accent); font-weight: 600; padding-top: 2px; }
   .task .body .t { font-size: 15px; font-weight: 600; }
   .task .body .d { font-size: 13px; color: var(--sub); }
+  .task .body .m { font-size: 12.5px; color: var(--green); font-weight: 600; margin-top: 1px; }
   .task.done .body .t { text-decoration: line-through; color: var(--sub); }
-  .task.done .body .d { text-decoration: line-through; opacity: .7; }
+  .task.done .body .d, .task.done .body .m { text-decoration: line-through; opacity: .7; }
 
-  .progressline { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .progressline { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
   .pbar { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
   .pbar > div { height: 100%; background: var(--green); border-radius: 99px; transition: width .25s; }
   .ptext { font-size: 13px; color: var(--sub); white-space: nowrap; }
-
   .donebanner {
     margin-top: 12px; background: var(--green-soft); color: var(--green);
     font-weight: 600; font-size: 14px; border-radius: 10px; padding: 10px 14px;
     display: none;
   }
 
-  /* 打卡热力条 */
+  .tipcard { background: linear-gradient(135deg, #f4f5ff, #fdf6ec); }
+  .tipcard .tip { font-size: 14px; }
+  .tomorrow { font-size: 13.5px; color: var(--sub); }
+  .tomorrow b { color: var(--ink); }
+
+  /* 热力条 */
   .heat { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
   .heat .cell {
     width: 22px; height: 22px; border-radius: 5px; background: var(--line);
     font-size: 9px; color: #999; display: flex; align-items: center; justify-content: center;
-    position: relative;
   }
   .heat .cell.full { background: var(--green); color: #fff; }
   .heat .cell.part { background: #f3c96b; color: #7a5b12; }
@@ -99,54 +109,138 @@
   .legend { font-size: 12px; color: var(--sub); margin-top: 8px; }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 4px 0 10px; vertical-align: -1px; }
 
-  /* 分数 */
-  .scoreform { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
-  .scoreform select, .scoreform input, .scoreform button {
-    font: inherit; font-size: 14px; padding: 7px 10px;
+  /* 表单通用 */
+  select, input[type="number"], input[type="date"], input[type="text"], textarea {
+    font: inherit; font-size: 14px; padding: 8px 10px;
     border: 1px solid var(--line); border-radius: 8px; background: #fff;
+    color: var(--ink);
   }
-  .scoreform input[type="number"] { width: 90px; }
-  .scoreform input[type="date"] { width: 150px; }
+  textarea { width: 100%; resize: vertical; }
   button.primary {
+    font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 8px;
     background: var(--accent); color: #fff; border: none; cursor: pointer; font-weight: 600;
   }
   button.primary:hover { filter: brightness(1.08); }
   button.ghost {
-    background: #fff; color: var(--accent); border: 1px solid var(--accent);
-    cursor: pointer; font-weight: 600; font-size: 14px; padding: 7px 14px; border-radius: 8px;
+    font: inherit; background: #fff; color: var(--accent); border: 1px solid var(--accent);
+    cursor: pointer; font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 8px;
   }
-  .bandtip { font-size: 12px; color: var(--sub); width: 100%; }
+  button.mini {
+    font: inherit; font-size: 12.5px; padding: 3px 10px; border-radius: 6px;
+    border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--accent);
+  }
+  .formrow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
-  th { color: var(--sub); font-weight: 600; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); }
+  th { color: var(--sub); font-weight: 600; font-size: 12.5px; }
   td .del { color: var(--red); cursor: pointer; font-size: 13px; background: none; border: none; }
   .band { font-weight: 700; }
   .band.good { color: var(--green); }
   .band.mid { color: var(--amber); }
   .band.low { color: var(--red); }
-
   #chartbox { margin-top: 14px; }
   #chartbox svg { width: 100%; height: 160px; }
 
-  /* 写作弹药库 */
-  .counters { display: flex; flex-wrap: wrap; gap: 24px; }
-  .counter { flex: 1; min-width: 220px; }
+  /* 写作计数 */
+  .counters { display: flex; flex-wrap: wrap; gap: 20px; }
+  .counter { flex: 1; min-width: 200px; }
   .counter .label { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-  .counter .ctrl { display: flex; align-items: center; gap: 10px; }
+  .counter .ctrl { display: flex; align-items: center; gap: 8px; }
   .counter .ctrl button {
-    width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line);
-    background: #fff; font-size: 16px; cursor: pointer; color: var(--accent);
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line);
+    background: #fff; font-size: 16px; cursor: pointer; color: var(--accent); flex: none;
   }
-  .counter .num { font-size: 18px; font-weight: 700; min-width: 64px; text-align: center; }
+  .counter .num { font-size: 17px; font-weight: 700; min-width: 58px; text-align: center; }
+
+  /* 计时器 */
+  .timerbox { text-align: center; }
+  .timerdisp {
+    font-size: 64px; font-weight: 800; font-variant-numeric: tabular-nums;
+    letter-spacing: 2px; margin: 8px 0 4px;
+  }
+  .timerdisp.running { color: var(--accent); }
+  .timerdisp.alarm { color: var(--red); animation: blink 1s step-start infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 12px; }
+  .presets button {
+    font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: #fff; cursor: pointer;
+  }
+  .presets button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .timerbtns { display: flex; gap: 10px; justify-content: center; }
+
+  /* 录音 */
+  .recbtn {
+    width: 76px; height: 76px; border-radius: 50%; border: none; cursor: pointer;
+    background: var(--red); color: #fff; font-size: 30px; display: block; margin: 6px auto 10px;
+    transition: transform .15s;
+  }
+  .recbtn.on { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 0 0 12px rgba(213,72,79,.12); } }
+  .rectime { text-align: center; font-size: 14px; color: var(--sub); margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .reclist .rec { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .reclist .rec .lbl { font-size: 13px; min-width: 130px; flex: 1; }
+  .reclist audio { height: 34px; max-width: 220px; }
+
+  /* 题库 */
+  .drawbox {
+    background: var(--accent-soft); border-radius: 10px; padding: 14px;
+    text-align: center; margin-bottom: 14px;
+  }
+  .drawbox .dt { font-size: 16px; font-weight: 700; min-height: 26px; margin-bottom: 8px; }
+  .catchips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .catchips button {
+    font: inherit; font-size: 12.5px; padding: 4px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: #fff; cursor: pointer;
+  }
+  .catchips button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .topic { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+  .topic .tt { flex: 1; font-size: 14px; }
+  .topic .cnt { font-size: 12px; color: #fff; background: var(--green); border-radius: 999px; padding: 1px 8px; }
+  .topic .cnt.zero { background: var(--line); color: var(--sub); }
+
+  /* 句型 */
+  .phrase { padding: 9px 4px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; align-items: flex-start; }
+  .phrase .tag { flex: none; font-size: 11.5px; background: var(--amber-soft); color: var(--amber); border-radius: 5px; padding: 1px 7px; margin-top: 3px; }
+  .phrase .pt { flex: 1; font-size: 14px; }
+  .quizbox { background: var(--amber-soft); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 14px; display: none; }
+  .quizbox ol { padding-left: 20px; }
+
+  /* 错题本 */
+  .causestat { margin-top: 12px; }
+  .causestat .row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 4px; }
+  .causestat .row .cl { width: 110px; color: var(--sub); flex: none; }
+  .causestat .row .cb { height: 12px; background: var(--red); border-radius: 4px; min-width: 4px; }
 
   .reportbtns { display: flex; gap: 10px; flex-wrap: wrap; }
   .copied { color: var(--green); font-size: 13px; font-weight: 600; align-self: center; display: none; }
+  .okflash { color: var(--green); font-size: 13px; font-weight: 600; display: none; }
 
-  footer { text-align: center; color: var(--sub); font-size: 12px; margin-top: 30px; }
+  footer { text-align: center; color: var(--sub); font-size: 12px; margin-top: 26px; }
+
+  /* 底部导航 */
+  nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    background: rgba(255,255,255,.96); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line); display: flex;
+  }
+  nav button {
+    flex: 1; border: none; background: none; cursor: pointer;
+    font: inherit; font-size: 11.5px; color: var(--sub);
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+  }
+  nav button .ico { font-size: 21px; }
+  nav button.on { color: var(--accent); font-weight: 700; }
+
+  .tab { display: none; }
+  .tab.on { display: block; }
+
   @media (max-width: 560px) {
-    .task .time { width: 78px; font-size: 12px; }
+    .task .time { width: 74px; font-size: 11.5px; }
     .countdown { margin-left: 0; }
+    .timerdisp { font-size: 52px; }
   }
 </style>
 </head>
@@ -159,100 +253,222 @@
       <span class="datechip" id="dateline"></span>
       <span class="countdown" id="countdown"></span>
     </div>
-    <div class="goalbar">目标 <b>总分 7.5</b> ｜ 路径：听力 <b>8</b> + 阅读 <b>8</b> + 写作 <b>6.5</b> + 口语 <b>6.5</b> ｜ 考试日 <b>2026-08-29（机考）</b></div>
+    <div class="goalbar">目标 <b>总分 7.5</b> ｜ 听 <b>8</b> · 读 <b>8</b> · 写 <b>6.5</b> · 说 <b>6.5</b> ｜ <b>2026-08-29 机考</b></div>
   </header>
 
-  <!-- 今日任务 -->
-  <div class="card">
-    <span class="phasechip" id="phasechip"></span>
-    <h2 id="todaytitle">今日任务</h2>
-    <div class="hint" id="phasehint"></div>
-    <div class="phasenote" id="phasenote" style="display:none"></div>
-    <div id="tasklist"></div>
-    <div class="progressline">
-      <div class="pbar"><div id="pfill" style="width:0%"></div></div>
-      <span class="ptext" id="ptext"></span>
-    </div>
-    <div class="donebanner" id="donebanner">✅ 今天全部完成。合上电脑,睡觉,明天见。</div>
-  </div>
-
-  <!-- 打卡记录 -->
-  <div class="card">
-    <h2>打卡记录</h2>
-    <div class="hint">规则你自己定的:跳过一晚,第二天不补、不重排,承认损失继续走。</div>
-    <div id="heat7" ></div>
-    <div class="legend">
-      <i style="background:var(--green)"></i>全部完成
-      <i style="background:#f3c96b"></i>部分完成
-      <i style="background:var(--red-soft)"></i>跳过
-      <span id="streaktext" style="margin-left:14px;font-weight:600;color:var(--ink)"></span>
-    </div>
-  </div>
-
-  <!-- 分数追踪 -->
-  <div class="card">
-    <h2>模考分数</h2>
-    <div class="hint">听力/阅读填对题数(0-40)自动换算分档;写作/口语直接填估分。第一条应该是你的剑12 Test 1摸底。</div>
-    <div class="scoreform">
-      <input type="date" id="s-date">
-      <select id="s-type">
-        <option value="听力">听力</option>
-        <option value="阅读">阅读</option>
-        <option value="写作">写作</option>
-        <option value="口语">口语</option>
-      </select>
-      <input type="number" id="s-raw" placeholder="对题数/估分" step="0.5" min="0" max="40">
-      <input type="text" id="s-note" placeholder="备注(如:剑12T1)" style="flex:1;min-width:120px">
-      <button class="primary" id="s-add">记录</button>
-      <div class="bandtip">检查点:8.15前后,听力阅读若没稳定在 7.5+ 且写作批改低于 6,目标调整为总分 7.0(申请实习也完全够用)。</div>
-    </div>
-    <table id="scoretable"><thead><tr><th>日期</th><th>科目</th><th>原始</th><th>分档</th><th>备注</th><th></th></tr></thead><tbody></tbody></table>
-    <div id="chartbox"></div>
-  </div>
-
-  <!-- 写作累计 -->
-  <div class="card">
-    <h2>写作弹药库</h2>
-    <div class="hint">8.20前:大作文累计15篇(教育/科技/环境/政府/犯罪/社会六大类),小作文8篇(线图/柱图/饼图/表格/流程图/地图各≥1)。每写完一篇点一下 +。</div>
-    <div class="counters">
-      <div class="counter">
-        <div class="label">大作文</div>
-        <div class="ctrl">
-          <button onclick="bumpEssay('big',-1)">−</button>
-          <span class="num" id="bignum"></span>
-          <button onclick="bumpEssay('big',1)">＋</button>
-          <div class="pbar" style="flex:1"><div id="bigbar" style="background:var(--accent)"></div></div>
-        </div>
+  <!-- ============ TAB 今日 ============ -->
+  <div class="tab on" id="tab-today">
+    <div class="card">
+      <span class="phasechip" id="phasechip"></span>
+      <h2 id="todaytitle">今日任务</h2>
+      <div class="hint" id="phasehint"></div>
+      <div class="phasenote" id="phasenote" style="display:none"></div>
+      <div id="tasklist"></div>
+      <div class="progressline">
+        <div class="pbar"><div id="pfill" style="width:0%"></div></div>
+        <span class="ptext" id="ptext"></span>
       </div>
-      <div class="counter">
-        <div class="label">小作文</div>
-        <div class="ctrl">
-          <button onclick="bumpEssay('small',-1)">−</button>
-          <span class="num" id="smallnum"></span>
-          <button onclick="bumpEssay('small',1)">＋</button>
-          <div class="pbar" style="flex:1"><div id="smallbar" style="background:var(--accent)"></div></div>
-        </div>
+      <div class="donebanner" id="donebanner">✅ 今天全部完成。合上手机,睡觉,明天见。</div>
+    </div>
+
+    <div class="card tipcard">
+      <h2>💡 今日一招</h2>
+      <div class="tip" id="tipline"></div>
+    </div>
+
+    <div class="card">
+      <h2>明日预告</h2>
+      <div class="tomorrow" id="tomorrowline"></div>
+    </div>
+
+    <div class="card">
+      <h2>向教练汇报</h2>
+      <div class="hint">练完点一下,把汇报粘贴给 Claude:作文逐句批改、口语按考官标准对练、按分数走势调计划。</div>
+      <div class="reportbtns">
+        <button class="ghost" id="report">📋 生成今日汇报并复制</button>
+        <span class="copied" id="copied">已复制,去粘贴给 Claude</span>
       </div>
     </div>
   </div>
 
-  <!-- 每日汇报 -->
-  <div class="card">
-    <h2>向教练汇报</h2>
-    <div class="hint">每晚结束后点这个按钮,把生成的汇报粘贴给 Claude,我来当你的批改老师和口语考官:作文逐句改、口语按考官标准追问 Part 3、根据分数走势帮你调计划。</div>
-    <div class="reportbtns">
-      <button class="ghost" id="report">📋 生成今日汇报并复制</button>
-      <span class="copied" id="copied">已复制,去粘贴给 Claude</span>
+  <!-- ============ TAB 工具 ============ -->
+  <div class="tab" id="tab-tools">
+    <div class="card timerbox">
+      <h2>⏱ 限时计时器</h2>
+      <div class="hint">模考和限时训练必须掐表,平时手松考场就崩。</div>
+      <div class="presets" id="presets"></div>
+      <div class="formrow" style="justify-content:center">
+        <input type="number" id="custommin" placeholder="自定义分钟" min="1" max="180" style="width:110px">
+        <button class="mini" id="setcustom">设定</button>
+      </div>
+      <div class="timerdisp" id="timerdisp">20:00</div>
+      <div class="timerbtns">
+        <button class="primary" id="timerstart">开始</button>
+        <button class="ghost" id="timerreset">重置</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎙 口语录音室</h2>
+      <div class="hint">P2 说满 2 分钟,录完立刻回放:数一数"嗯…"出现了几次,听听哪句卡壳。录音存在本机。</div>
+      <div class="formrow">
+        <input type="text" id="reclabel" placeholder="话题(如:描述一位敬佩的人)" style="flex:1;min-width:180px">
+      </div>
+      <button class="recbtn" id="recbtn">●</button>
+      <div class="rectime" id="rectime">点击开始录音</div>
+      <div class="reclist" id="reclist"></div>
     </div>
   </div>
 
-  <footer>材料只有五样:剑桥真题12-20 · 王陆听力语料库 · 顾家北写作 · 当季口语题库 · Anki。别再买了。</footer>
+  <!-- ============ TAB 题库 ============ -->
+  <div class="tab" id="tab-bank">
+    <div class="card">
+      <h2>🗣 口语 Part 2 题库</h2>
+      <div class="hint">内置经典高频话题打底;<b>以雅思哥/小站 App 的 5-8 月当季题库为准</b>,把里面的题用下面"添加"补进来。每练一次点 +1,考前每题至少 1 次。</div>
+      <div class="drawbox">
+        <div class="dt" id="drawtopic">👇 点下面抽一题,现在就说 2 分钟</div>
+        <button class="primary" id="drawbtn">🎲 抽一题(优先没练过的)</button>
+      </div>
+      <div class="catchips" id="catchips"></div>
+      <div class="formrow">
+        <input type="text" id="newtopic" placeholder="添加当季新题…" style="flex:1;min-width:150px">
+        <select id="newtopiccat"></select>
+        <button class="mini" id="addtopic">添加</button>
+      </div>
+      <div id="topiclist"></div>
+    </div>
+
+    <div class="card">
+      <h2>✍️ 写作句型库</h2>
+      <div class="hint">7月每天从顾家北/Simon 抄 3 句进来。<b>能脱稿默写出来的句型才是你的</b>——常点"抽3句默写"自测。</div>
+      <div class="quizbox" id="quizbox"></div>
+      <div class="formrow">
+        <button class="ghost" id="quizbtn">🎯 抽 3 句默写</button>
+        <span class="okflash" id="quizdone"></span>
+      </div>
+      <div class="formrow">
+        <input type="text" id="newphrase" placeholder="抄一个可复用句型…" style="flex:1;min-width:170px">
+        <select id="newphrasetag">
+          <option>开头</option><option>观点</option><option>让步</option>
+          <option>例证</option><option>结论</option><option>图表</option><option>其他</option>
+        </select>
+        <button class="mini" id="addphrase">存入</button>
+      </div>
+      <div id="phraselist"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB 记录 ============ -->
+  <div class="tab" id="tab-record">
+    <div class="card">
+      <h2>打卡记录</h2>
+      <div class="hint">跳过一晚,第二天不补、不重排,承认损失继续走——你自己定的规矩。</div>
+      <div id="heat7"></div>
+      <div class="legend">
+        <i style="background:var(--green)"></i>全部完成
+        <i style="background:#f3c96b"></i>部分完成
+        <i style="background:var(--red-soft)"></i>跳过
+        <span id="streaktext" style="margin-left:14px;font-weight:600;color:var(--ink)"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>模考分数</h2>
+      <div class="hint">听力/阅读填对题数(0-40)自动换算分档;写作/口语填估分。第一条应该是剑12 Test 1 摸底。</div>
+      <div class="formrow">
+        <input type="date" id="s-date">
+        <select id="s-type">
+          <option value="听力">听力</option>
+          <option value="阅读">阅读</option>
+          <option value="写作">写作</option>
+          <option value="口语">口语</option>
+        </select>
+        <input type="number" id="s-raw" placeholder="对题数/估分" step="0.5" min="0" max="40" style="width:110px">
+        <input type="text" id="s-note" placeholder="备注(如:剑12T1)" style="flex:1;min-width:110px">
+        <button class="primary" id="s-add">记录</button>
+      </div>
+      <div class="hint">⚠️ 8.15 检查点:听读没稳定 7.5+ 且写作低于 6 → 目标调为 7.0,不弃考。</div>
+      <table id="scoretable"><thead><tr><th>日期</th><th>科目</th><th>原始</th><th>分档</th><th>备注</th><th></th></tr></thead><tbody></tbody></table>
+      <div id="chartbox"></div>
+    </div>
+
+    <div class="card">
+      <h2>📕 错题本</h2>
+      <div class="hint">每道错题 10 秒记一笔。错因分布会告诉你该补什么——这本子 8 月下旬比任何新题都值钱。</div>
+      <div class="formrow">
+        <select id="e-subj"><option>阅读</option><option>听力</option></select>
+        <input type="text" id="e-src" placeholder="来源(如:剑13T2P3 Q32)" style="flex:1;min-width:140px">
+      </div>
+      <div class="formrow">
+        <select id="e-cause">
+          <option>同义替换没反应</option><option>词汇不认识</option><option>长难句没读懂</option>
+          <option>定位错误</option><option>没听清/走神</option><option>题型不熟</option>
+          <option>粗心手滑</option><option>其他</option>
+        </select>
+        <input type="text" id="e-note" placeholder="一句话备注(可空)" style="flex:1;min-width:120px">
+        <button class="primary" id="e-add">记一笔</button>
+      </div>
+      <div class="causestat" id="causestat"></div>
+      <details style="margin-top:10px">
+        <summary style="cursor:pointer;font-size:13.5px;color:var(--accent);font-weight:600">展开全部错题(<span id="errcount">0</span>)</summary>
+        <table id="errtable"><thead><tr><th>日期</th><th>科目</th><th>来源</th><th>错因</th><th>备注</th><th></th></tr></thead><tbody></tbody></table>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>写作弹药库</h2>
+      <div class="hint">8.20 前:大作文 15 篇(教育/科技/环境/政府/犯罪/社会),小作文 8 篇(线/柱/饼/表/流程/地图各≥1)。</div>
+      <div class="counters">
+        <div class="counter">
+          <div class="label">大作文</div>
+          <div class="ctrl">
+            <button onclick="bumpEssay('big',-1)">−</button>
+            <span class="num" id="bignum"></span>
+            <button onclick="bumpEssay('big',1)">＋</button>
+            <div class="pbar" style="flex:1"><div id="bigbar" style="background:var(--accent)"></div></div>
+          </div>
+        </div>
+        <div class="counter">
+          <div class="label">小作文</div>
+          <div class="ctrl">
+            <button onclick="bumpEssay('small',-1)">−</button>
+            <span class="num" id="smallnum"></span>
+            <button onclick="bumpEssay('small',1)">＋</button>
+            <div class="pbar" style="flex:1"><div id="smallbar" style="background:var(--accent)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💾 数据备份 / 换设备</h2>
+      <div class="hint">数据只存在当前浏览器里。换设备:在旧设备点"导出"发给自己,在新设备粘贴后点"导入"。建议每周日模考后备份一次。</div>
+      <div class="reportbtns">
+        <button class="ghost" id="exportbtn">导出全部数据(复制)</button>
+        <span class="copied" id="exportok">已复制,发给自己保存</span>
+      </div>
+      <div class="formrow" style="margin-top:10px">
+        <textarea id="importbox" rows="3" placeholder="把导出的那串文字粘贴到这里…"></textarea>
+      </div>
+      <button class="mini" id="importbtn">导入(会覆盖当前数据)</button>
+      <span class="okflash" id="importok">导入成功!</span>
+    </div>
+
+    <footer>材料只有五样:剑桥真题12-20 · 王陆听力语料库 · 顾家北写作 · 当季口语题库 · Anki。别再买了。</footer>
+  </div>
 </div>
 
+<nav>
+  <button data-tab="tab-today" class="on"><span class="ico">📅</span>今日</button>
+  <button data-tab="tab-tools"><span class="ico">⏱</span>工具</button>
+  <button data-tab="tab-bank"><span class="ico">📚</span>题库</button>
+  <button data-tab="tab-record"><span class="ico">📊</span>记录</button>
+</nav>
+
 <script>
-/* ---------- 工具 ---------- */
-const EXAM = new Date(2026, 7, 29);        // 2026-08-29
-const START = new Date(2026, 6, 6);        // 计划起点 2026-07-06
+/* ================= 基础 ================= */
+const EXAM = new Date(2026, 7, 29);
+const START = new Date(2026, 6, 6);
 const pad = n => String(n).padStart(2, '0');
 const key = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const today = new Date(); today.setHours(0,0,0,0);
@@ -261,8 +477,18 @@ const store = {
   get(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch(e) { return fb; } },
   set(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
 };
+const $ = id => document.getElementById(id);
 
-/* ---------- 分档换算(剑桥官方近似) ---------- */
+/* 底部导航 */
+document.querySelectorAll('nav button').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  $(btn.dataset.tab).classList.add('on');
+  window.scrollTo(0, 0);
+}));
+
+/* ================= 分档换算 ================= */
 function band(type, raw) {
   raw = Number(raw);
   if (type === '写作' || type === '口语') return raw;
@@ -274,33 +500,90 @@ function band(type, raw) {
   return 3.5;
 }
 
-/* ---------- 每日任务生成 ---------- */
+/* ================= 真题排期引擎 ================= */
+/* 7月晚间阅读:剑13→16 每晚顺序 2 篇 */
+function flatPassages() {
+  const arr = [];
+  for (const b of [13, 14, 15, 16])
+    for (let t = 1; t <= 4; t++)
+      for (let p = 1; p <= 3; p++)
+        arr.push(`剑${b} T${t} P${p}`);
+  return arr;
+}
+const PASSAGES = flatPassages();
+function julyNightIndex(d) { // 7.6 起第几个非周日晚(0-based)
+  let n = -1;
+  for (let dd = 6; dd <= d.getDate(); dd++) {
+    if (new Date(2026, 6, dd).getDay() !== 0) n++;
+  }
+  return n;
+}
+function julyReading(d) {
+  const i = julyNightIndex(d) * 2;
+  const a = PASSAGES[i], b = PASSAGES[i + 1];
+  return (a && b) ? `${a} + ${b}` : (a ? a : '重做本月错题篇目');
+}
+function julyChapter(d) {
+  const dd = d.getDate();
+  if (dd <= 12) return '第3章(数字/字母)';
+  if (dd <= 19) return '第4章(场景词)';
+  if (dd <= 26) return '第5章(核心场景词)';
+  return '第11章(学术场景)';
+}
+const JULY_MOCK = { 12: '剑12 T2', 19: '剑12 T3', 26: '剑12 T4' };
+/* 8.1-8.10 */
+function augListening(d) {
+  const i = (d.getDate() - 1) * 2;
+  if (i >= 16) return '复听本月错题 section';
+  const lab = j => `剑16 T${Math.floor(j/4)+1} S${j%4+1}`;
+  return `${lab(i)} + ${lab(i+1)}`;
+}
+function augReading(d) {
+  const dd = d.getDate();
+  if (dd <= 4) return `剑20 T${dd} 整卷3篇(60min连做)`;
+  if (dd === 5) return '剑19 T4 整卷3篇(60min连做)';
+  return '重做7月错题篇目 + 过错题本';
+}
+const AUG_MOCK_1 = { 11: '剑17 T1', 13: '剑17 T2', 15: '剑17 T3', 17: '剑17 T4', 19: '剑18 T1' };
+const AUG_MOCK_2 = { 21: '剑18 T2', 23: '剑18 T3', 25: '剑18 T4' };
+
+/* ================= 每日任务 ================= */
 function planFor(d) {
   const m = d.getMonth() + 1, day = d.getDate(), dow = d.getDay();
-  const T = (time, t, dtl) => ({ time, t, d: dtl });
+  const T = (time, t, dtl, mat) => ({ time, t, d: dtl, m: mat || null });
 
-  if (d < START) return { phase: '计划未开始', hint: '', tasks: [] };
+  if (d < START) return { phase: '计划未开始', title: '', hint: '', tasks: [] };
 
   if (m === 7) {
+    if (day === 6) return {
+      phase: '7月 · 打底期', title: '第一晚:摸底',
+      hint: '今晚只做一件事:搞清楚自己现在站在哪。严格计时,不许暂停。',
+      tasks: [
+        T('19:00-19:45', '听力摸底:剑12 T1', '4个section连做,只放一遍,30min+誊写', '摸底专用,做完别对细节,先出分'),
+        T('19:45-20:45', '阅读摸底:剑12 T1', '3篇60min严格限时,到点就停', null),
+        T('20:45-21:15', '对答案+换算', '分数录入"记录"页,发给Claude定7月配比', null),
+        T('21:15-22:00', '浏览错题', '只看错在哪,不精读,明天开始正式训练', null),
+      ]
+    };
     if (dow === 0) return {
       phase: '7月 · 打底期', title: '周日模考日',
       hint: '每周日晚:听力+阅读整套,记录分数走势。',
       tasks: [
-        T('19:00-21:00', '全套模考:听力+阅读', '剑桥真题一套(剑12-15),严格计时:听力30min+誊写10min,阅读60min'),
-        T('21:00-21:30', '对答案+换算分档', '录入下面的分数表,看走势'),
-        T('21:30-22:00', '错题归因', '每道错题写清错因:没听到/没看懂/理解偏差/粗心,生词进Anki'),
-        T('白天碎片', 'Anki 清 20 个生词', '不占晚上时间'),
+        T('19:00-21:00', '全套模考:听力+阅读', '严格计时:听力30min+誊写10min,阅读60min', `今晚套题:${JULY_MOCK[day] || '剑12-16未用套题'}`),
+        T('21:00-21:30', '对答案+录分', '录入"记录"页,看走势', null),
+        T('21:30-22:00', '错题归因', '每道错题在错题本记一笔,生词进Anki', null),
+        T('白天碎片', 'Anki 清 20 个生词', '不占晚上时间', null),
       ]
     };
     return {
       phase: '7月 · 打底期', title: '晚间四段(19:00-22:00)',
       hint: '白天公益课,晚上雷打不动三小时。前10天听写会很痛苦,坚持住。',
       tasks: [
-        T('19:00-19:40', '听力听写', '王陆语料库第3/4/5/11章,一句一句听写,错词进Anki'),
-        T('19:40-20:40', '阅读精读 2 篇', '剑12-15,先限时20min/篇做题,再20min精读:生词+长难句+错因写在题旁'),
-        T('20:40-21:20', '写作输入', '顾家北1节 或 Simon范文1篇,精读+抄3个可复用句型(7月不写整篇)'),
-        T('21:20-22:00', '口语', '当季题库 P1两话题+P2一话题,列关键词说(不写稿),录音回听'),
-        T('白天碎片', 'Anki 清 20 个生词', '听写和阅读里的生词,不背单词书'),
+        T('19:00-19:40', '听力听写', '王陆语料库,一句一句听写,错词进Anki', `本周章节:${julyChapter(d)}`),
+        T('19:40-20:40', '阅读精读 2 篇', '限时20min/篇做题→20min精读:生词+长难句+错题进错题本', `今晚篇目:${julyReading(d)}`),
+        T('20:40-21:20', '写作输入', '顾家北1节 或 Simon范文1篇,抄3个句型进"题库→句型库"', null),
+        T('21:20-22:00', '口语', 'P1两话题+P2一话题(题库页抽题),录音室录音回听', null),
+        T('白天碎片', 'Anki 清 20 个生词', '听写和阅读里的生词,不背单词书', null),
       ]
     };
   }
@@ -308,11 +591,11 @@ function planFor(d) {
   if (m === 8) {
     if (day <= 10) {
       const tasks = [
-        T('09:00-12:00', '听力精听+阅读限时', '听力2个section逐句听懂为止;阅读3篇限时(20min/篇)'),
-        T('14:00-17:00', '大作文 1 篇', '40min限时写→发给Claude批改→重写重点段。写完记得在下面弹药库+1'),
-        T('19:00-21:00', '口语 Part 2 串题', '3个话题:出关键词框架+录音回听'),
+        T('09:00-12:00', '听力精听 + 阅读限时', '精听逐句听懂为止;阅读到点就停,错题进错题本', `精听:${augListening(d)} ｜ 阅读:${augReading(d)}`),
+        T('14:00-17:00', '大作文 1 篇', '40min限时写→发Claude批改→重写重点段→弹药库+1', null),
+        T('19:00-21:00', '口语 Part 2 串题', '题库页抽3个话题:关键词框架+录音室各说2分钟', null),
       ];
-      if (day % 2 === 0) tasks.splice(2, 0, T('17:00-17:40', '小作文 1 篇', '隔天一篇,线图/柱图/饼图/表格/流程图/地图轮着来'));
+      if (day % 2 === 0) tasks.splice(2, 0, T('17:00-17:40', '小作文 1 篇', '线/柱/饼/表/流程/地图轮着来,写完弹药库+1', null));
       return {
         phase: '8月 · 周期1(8.1-8.10)', title: '写作攻坚启动',
         hint: '全天备考。写作是唯一真正的风险点,这10天把它顶上去。',
@@ -321,41 +604,34 @@ function planFor(d) {
     }
     if (day <= 20) {
       const isMock = day % 2 === 1;
-      const base = isMock ? {
-        title: '全真模考日',
-        tasks: [
-          T('09:00-12:00', '全真模考(剑17-20)', '按真实流程:听力→阅读→写作连着做,中途不休息不看手机'),
-          T('14:00-16:00', '对答案+写作自评', '分数录入下方;写作发给Claude逐句批改'),
-          T('19:00-21:00', '口语题库推进', '当季题库继续串,录音回听'),
-        ]
-      } : {
-        title: '补弱日',
-        tasks: [
-          T('09:00-12:00', '处理昨日模考弱项', '哪项掉分补哪项:听力精听错的section/阅读错题精读'),
-          T('14:00-17:00', '写作补量', '大作文或小作文1篇,朝着15篇/8篇的目标推进'),
-          T('19:00-21:00', '口语题库推进', '当季题库继续串,录音回听'),
-        ]
-      };
       return {
-        phase: '8月 · 周期2(8.11-8.20)', title: base.title,
-        hint: '隔天一次全真模考,非模考日补弱。真题用剑17-20。',
-        note: (day >= 14 && day <= 16) ? '⚠️ 中期检查点:听力阅读若没稳定 7.5+、写作批改低于6 → 目标调整为总分7.0,不弃考。' : null,
-        tasks: base.tasks
+        phase: '8月 · 周期2(8.11-8.20)', title: isMock ? '全真模考日' : '补弱日',
+        hint: '隔天一次全真模考,非模考日补弱。',
+        note: (day >= 14 && day <= 16) ? '⚠️ 中期检查点:听读没稳定7.5+、写作低于6 → 目标调为总分7.0,不弃考。' : null,
+        tasks: isMock ? [
+          T('09:00-12:00', '全真模考', '听力→阅读→写作连做,中途不休息不看手机', `今日套题:${AUG_MOCK_1[day] || '剑17-18'}`),
+          T('14:00-16:00', '对答案+写作自评', '录分;错题进错题本;写作发Claude批改', null),
+          T('19:00-21:00', '口语题库推进', '题库页抽题+录音回听', null),
+        ] : [
+          T('09:00-12:00', '处理昨日模考弱项', '哪项掉分补哪项:精听错的section/精读错的篇目', null),
+          T('14:00-17:00', '写作补量', '大作文或小作文1篇,朝15/8篇推进', null),
+          T('19:00-21:00', '口语题库推进', '题库页抽题+录音回听', null),
+        ]
       };
     }
     if (day <= 25) {
       const isMock = day % 2 === 1;
       return {
         phase: '8月 · 周期3(8.21-8.28)', title: isMock ? '全套模考日(含口语)' : '错题消化日',
-        hint: '每2天一次全套模考,含口语——找真人对练,或对着Claude练,让它按考官标准追问Part 3。',
+        hint: '每2天一次全套模考含口语——真人对练,或对Claude练,让它按考官标准追问Part 3。',
         tasks: isMock ? [
-          T('09:00-12:00', '全套模考:听力→阅读→写作', '真实流程连做'),
-          T('14:00-15:00', '口语全真模拟', '真人对练或对Claude练,P1→P2→P3完整走一遍'),
-          T('16:00-18:00', '复盘+录分', '分数录入,写作发批改'),
+          T('09:00-12:00', '全套模考', '听力→阅读→写作连做', `今日套题:${AUG_MOCK_2[day] || '剑19'}`),
+          T('14:00-15:00', '口语全真模拟', 'P1→P2→P3完整走一遍并录音', null),
+          T('16:00-18:00', '复盘+录分', '错题进错题本,写作发批改', null),
         ] : [
-          T('09:00-12:00', '过错题本', '只看错过的题,不做新题'),
-          T('14:00-17:00', '写作句型内化', '把7-8月积累的句型脱稿默写一遍,能默出来才算你的'),
-          T('19:00-21:00', '口语题库扫尾', '没说熟的话题重点过'),
+          T('09:00-12:00', '过错题本', '按错因分类过,同义替换类重点背替换词对', null),
+          T('14:00-17:00', '句型默写', '句型库"抽3句默写"连点5轮,默不出的重点记', null),
+          T('19:00-21:00', '口语题库扫尾', '练过次数少的话题优先', null),
         ]
       };
     }
@@ -363,55 +639,53 @@ function planFor(d) {
       phase: '8月 · 最后3天', title: '收口,不做新题',
       hint: '新题只会制造焦虑,不会涨分。',
       tasks: [
-        T('上午', '过错题本', '从头到尾翻一遍,只看错因'),
-        T('下午', '写作句型+模板过一遍', '大小作文各类结构在脑子里过'),
-        T('晚上', '口语题库从头到尾每题说一遍', '不求完美,求嘴熟'),
+        T('上午', '过错题本', '从头到尾翻一遍,只看错因', null),
+        T('下午', '句型+模板过一遍', '大小作文各类结构在脑子里过', null),
+        T('晚上', '口语题库从头到尾每题说一遍', '不求完美,求嘴熟', null),
       ]
     };
     if (day === 28) return {
       phase: '考前一天', title: '8.28 · 放松日',
       hint: '你已经准备了近两个月,今天做什么都不会再改变分数,睡好才会。',
       tasks: [
-        T('白天', '只看错题本', '轻松过一遍,别做题'),
-        T('傍晚', '确认考试装备', '身份证/确认信/考场路线/闹钟'),
-        T('22:00前', '睡觉', '不可协商'),
+        T('白天', '只看错题本', '轻松过一遍,别做题', null),
+        T('傍晚', '确认考试装备', '身份证/确认信/考场路线/两个闹钟', null),
+        T('22:00前', '睡觉', '不可协商', null),
       ]
     };
     if (day === 29) return {
       phase: '考试日', title: '🔥 上场',
-      hint: '吃好早餐,提前到场。听力抓平稳,阅读控节奏,写作先审题再动笔,口语大声自信。',
-      tasks: [ T('全天', '考试', '你练过的每一天都在替你答题') ]
+      hint: '吃好早餐,提前到场。听力抓平稳,阅读控节奏,写作先审题,口语大声自信。',
+      tasks: [ T('全天', '考试', '你练过的每一天都在替你答题', null) ]
     };
-    return { phase: '考后', title: '等出分', hint: '机考1-3天出分。出了发给我,我们看下一步。', tasks: [ T('—', '休息', '你值得') ] };
+    return { phase: '考后', title: '等出分', hint: '机考1-3天出分。出了发给我,我们看下一步。', tasks: [ T('—', '休息', '你值得', null) ] };
   }
   return { phase: '考后', title: '计划已结束', hint: '', tasks: [] };
 }
 
-/* ---------- 渲染:今日 ---------- */
+/* ================= 今日渲染 ================= */
 const plan = planFor(today);
 const chkKey = 'chk:' + todayKey;
 let checks = store.get(chkKey, []);
 
 function renderToday() {
   const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
-  document.getElementById('dateline').textContent = `${todayKey} ${weekdays[today.getDay()]}`;
+  $('dateline').textContent = `${todayKey} ${weekdays[today.getDay()]}`;
   const days = Math.round((EXAM - today) / 86400000);
-  document.getElementById('countdown').textContent =
-    days > 0 ? `距考试 ${days} 天` : days === 0 ? '今天考试!' : '考试已结束';
-  document.getElementById('phasechip').textContent = plan.phase;
-  document.getElementById('todaytitle').textContent = plan.title || '今日任务';
-  document.getElementById('phasehint').textContent = plan.hint || '';
-  const noteEl = document.getElementById('phasenote');
-  if (plan.note) { noteEl.textContent = plan.note; noteEl.style.display = 'block'; }
+  $('countdown').textContent = days > 0 ? `距考试 ${days} 天` : days === 0 ? '今天考试!' : '考试已结束';
+  $('phasechip').textContent = plan.phase;
+  $('todaytitle').textContent = plan.title || '今日任务';
+  $('phasehint').textContent = plan.hint || '';
+  if (plan.note) { $('phasenote').textContent = plan.note; $('phasenote').style.display = 'block'; }
 
-  const list = document.getElementById('tasklist');
+  const list = $('tasklist');
   list.innerHTML = '';
   plan.tasks.forEach((task, i) => {
     const row = document.createElement('label');
     row.className = 'task' + (checks[i] ? ' done' : '');
     row.innerHTML = `<input type="checkbox" ${checks[i] ? 'checked' : ''}>
       <span class="time">${task.time}</span>
-      <span class="body"><div class="t">${task.t}</div><div class="d">${task.d}</div></span>`;
+      <span class="body"><div class="t">${task.t}</div><div class="d">${task.d}</div>${task.m ? `<div class="m">📖 ${task.m}</div>` : ''}</span>`;
     row.querySelector('input').addEventListener('change', e => {
       checks[i] = e.target.checked;
       store.set(chkKey, checks);
@@ -421,17 +695,45 @@ function renderToday() {
     list.appendChild(row);
   });
   renderProgress();
+
+  /* 今日一招 */
+  const tips = [
+    '听写听不出的词,先按发音猜拼写再对答案,印象深一倍。',
+    '阅读的唯一考点是同义替换:对答案时把"题干词↔原文词"抄进错题本备注。',
+    '大作文先花5分钟列提纲,论点想不清楚绝不动笔。',
+    '口语录音回听时数一数"嗯…"出现几次,明天目标减半。',
+    '听力section之间的读题时间,全部用来划后面题目的关键词。',
+    '阅读先读题再读文,带着关键词回原文定位,不要通读。',
+    'False是原文说了相反的话;Not Given是原文压根没提。分不清就问这句。',
+    '写作7分不靠长句:一个从句就够,写对永远比写长重要。',
+    '口语P2没思路就用5W展开:谁/何时/何地/为什么/什么感受。',
+    '一句精听5遍还听不出就看原文,标记发音现象:连读?弱读?吞音?',
+    '地图题先在图上标方位词:clockwise / opposite / adjacent to。',
+    '小作文第一句改写题目:shows / illustrates / compares 换着用。',
+    '一道错题弄透 = 十道新题。错题本每天都要喂。',
+    '模考时提前2分钟检查答案的习惯,现在就开始养。',
+    '口语考官不在乎观点对错,只在乎你说得顺不顺、展不展得开。',
+  ];
+  const doy = Math.floor((today - new Date(2026, 0, 1)) / 86400000);
+  $('tipline').textContent = tips[doy % tips.length];
+
+  /* 明日预告 */
+  const tm = new Date(today); tm.setDate(tm.getDate() + 1);
+  const tp = planFor(tm);
+  $('tomorrowline').innerHTML = tp.tasks.length
+    ? `<b>${tp.phase} · ${tp.title}</b><br>${tp.tasks.slice(0, 3).map(t => `${t.time} ${t.t}${t.m ? `(${t.m})` : ''}`).join('<br>')}`
+    : '计划已结束';
 }
 
 function renderProgress() {
   const total = plan.tasks.length;
   const done = plan.tasks.reduce((n, _, i) => n + (checks[i] ? 1 : 0), 0);
-  document.getElementById('pfill').style.width = total ? (done/total*100) + '%' : '0%';
-  document.getElementById('ptext').textContent = `${done} / ${total}`;
-  document.getElementById('donebanner').style.display = (total && done === total) ? 'block' : 'none';
+  $('pfill').style.width = total ? (done/total*100) + '%' : '0%';
+  $('ptext').textContent = `${done} / ${total}`;
+  $('donebanner').style.display = (total && done === total) ? 'block' : 'none';
 }
 
-/* ---------- 渲染:热力条 ---------- */
+/* ================= 热力条 ================= */
 function dayStatus(d) {
   const p = planFor(d);
   if (!p.tasks.length) return null;
@@ -441,13 +743,11 @@ function dayStatus(d) {
   if (done > 0) return 'part';
   return 'miss';
 }
-
 function renderHeat() {
-  const box = document.getElementById('heat7');
+  const box = $('heat7');
   box.innerHTML = '';
-  let streak = 0, missed = 0, curStreakBroken = false;
-  const months = [[2026, 6, '7月'], [2026, 7, '8月']];
-  months.forEach(([y, mo, label]) => {
+  let full = 0, missed = 0;
+  [[2026, 6, '7月'], [2026, 7, '8月']].forEach(([y, mo, label]) => {
     const title = document.createElement('div');
     title.style.cssText = 'font-size:12px;color:var(--sub);margin:10px 0 4px;font-weight:600';
     title.textContent = label;
@@ -466,30 +766,26 @@ function renderHeat() {
       else {
         const s = dayStatus(d);
         if (s) cell.classList.add(s);
-        if (d < today) {
-          if (s === 'full') streak++;
-          else { missed++; }
-        }
+        if (d < today) { if (s === 'full') full++; else missed++; }
       }
       grid.appendChild(cell);
     }
     box.appendChild(grid);
   });
-  document.getElementById('streaktext').textContent = `已完成 ${streak} 天 · 跳过 ${missed} 天`;
+  $('streaktext').textContent = `已完成 ${full} 天 · 跳过 ${missed} 天`;
 }
 
-/* ---------- 分数 ---------- */
+/* ================= 分数 ================= */
 function renderScores() {
   const scores = store.get('scores', []);
   const tbody = document.querySelector('#scoretable tbody');
   tbody.innerHTML = '';
   scores.forEach((s, i) => {
-    const b = s.band;
-    const cls = b >= 7.5 ? 'good' : b >= 6.5 ? 'mid' : 'low';
+    const cls = s.band >= 7.5 ? 'good' : s.band >= 6.5 ? 'mid' : 'low';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${s.date}</td><td>${s.type}</td><td>${s.raw}</td>
-      <td class="band ${cls}">${b}</td><td>${s.note || ''}</td>
-      <td><button class="del" data-i="${i}">删除</button></td>`;
+    tr.innerHTML = `<td>${s.date.slice(5)}</td><td>${s.type}</td><td>${s.raw}</td>
+      <td class="band ${cls}">${s.band}</td><td>${s.note || ''}</td>
+      <td><button class="del" data-i="${i}">删</button></td>`;
     tbody.appendChild(tr);
   });
   tbody.querySelectorAll('.del').forEach(btn => btn.addEventListener('click', () => {
@@ -500,16 +796,15 @@ function renderScores() {
   }));
   renderChart(scores);
 }
-
 function renderChart(scores) {
-  const box = document.getElementById('chartbox');
+  const box = $('chartbox');
   const series = { '听力': [], '阅读': [], '写作': [] };
   scores.forEach(s => { if (series[s.type]) series[s.type].push(s.band); });
   const maxLen = Math.max(...Object.values(series).map(a => a.length));
   if (maxLen < 2) { box.innerHTML = ''; return; }
   const W = 800, H = 160, PL = 34, PR = 10, PT = 12, PB = 22;
   const x = i => PL + (W - PL - PR) * (maxLen === 1 ? 0 : i / (maxLen - 1));
-  const y = b => PT + (H - PT - PB) * (1 - (b - 4) / 5); // 4~9分
+  const y = b => PT + (H - PT - PB) * (1 - (b - 4) / 5);
   const colors = { '听力': '#4f5ee3', '阅读': '#2eaa6e', '写作': '#d98a1f' };
   let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   [5,6,7,8,9].forEach(b => {
@@ -526,34 +821,72 @@ function renderChart(scores) {
     svg += `<text x="${lx}" y="${H-6}" font-size="12" fill="${colors[name]}" font-weight="600">● ${name}</text>`;
     lx += 64;
   }
-  svg += '</svg>';
-  box.innerHTML = svg;
+  box.innerHTML = svg + '</svg>';
 }
-
-document.getElementById('s-date').value = todayKey;
-document.getElementById('s-add').addEventListener('click', () => {
-  const date = document.getElementById('s-date').value;
-  const type = document.getElementById('s-type').value;
-  const raw = document.getElementById('s-raw').value;
-  const note = document.getElementById('s-note').value.trim();
+$('s-date').value = todayKey;
+$('s-add').addEventListener('click', () => {
+  const date = $('s-date').value, type = $('s-type').value;
+  const raw = $('s-raw').value, note = $('s-note').value.trim();
   if (!date || raw === '') return alert('日期和分数都要填');
   const arr = store.get('scores', []);
   arr.push({ date, type, raw: Number(raw), band: band(type, raw), note });
   arr.sort((a, b) => a.date < b.date ? -1 : 1);
   store.set('scores', arr);
-  document.getElementById('s-raw').value = '';
-  document.getElementById('s-note').value = '';
+  $('s-raw').value = ''; $('s-note').value = '';
   renderScores();
 });
 
-/* ---------- 写作计数 ---------- */
+/* ================= 错题本 ================= */
+function renderErrors() {
+  const errs = store.get('errors', []);
+  $('errcount').textContent = errs.length;
+  const tbody = document.querySelector('#errtable tbody');
+  tbody.innerHTML = '';
+  [...errs].reverse().forEach((e, ri) => {
+    const i = errs.length - 1 - ri;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${e.date.slice(5)}</td><td>${e.subj}</td><td>${e.src}</td><td>${e.cause}</td><td>${e.note || ''}</td>
+      <td><button class="del" data-i="${i}">删</button></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll('.del').forEach(btn => btn.addEventListener('click', () => {
+    const arr = store.get('errors', []);
+    arr.splice(Number(btn.dataset.i), 1);
+    store.set('errors', arr);
+    renderErrors();
+  }));
+  /* 错因分布 */
+  const stat = {};
+  errs.forEach(e => stat[e.cause] = (stat[e.cause] || 0) + 1);
+  const max = Math.max(1, ...Object.values(stat));
+  const box = $('causestat');
+  const entries = Object.entries(stat).sort((a, b) => b[1] - a[1]);
+  box.innerHTML = entries.length ? '<div style="font-size:13px;font-weight:600;margin-bottom:6px">错因分布(该补什么一目了然)</div>' : '';
+  entries.forEach(([c, n]) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<span class="cl">${c}</span><div class="cb" style="width:${n/max*55}%"></div><span>${n}</span>`;
+    box.appendChild(row);
+  });
+}
+$('e-add').addEventListener('click', () => {
+  const src = $('e-src').value.trim();
+  if (!src) return alert('来源要填,不然复习时找不到题');
+  const arr = store.get('errors', []);
+  arr.push({ date: todayKey, subj: $('e-subj').value, src, cause: $('e-cause').value, note: $('e-note').value.trim() });
+  store.set('errors', arr);
+  $('e-src').value = ''; $('e-note').value = '';
+  renderErrors();
+});
+
+/* ================= 写作计数 ================= */
 const ESSAY_GOAL = { big: 15, small: 8 };
 function renderEssays() {
   const e = store.get('essays', { big: 0, small: 0 });
-  document.getElementById('bignum').textContent = `${e.big} / ${ESSAY_GOAL.big}`;
-  document.getElementById('smallnum').textContent = `${e.small} / ${ESSAY_GOAL.small}`;
-  document.getElementById('bigbar').style.width = Math.min(100, e.big / ESSAY_GOAL.big * 100) + '%';
-  document.getElementById('smallbar').style.width = Math.min(100, e.small / ESSAY_GOAL.small * 100) + '%';
+  $('bignum').textContent = `${e.big} / ${ESSAY_GOAL.big}`;
+  $('smallnum').textContent = `${e.small} / ${ESSAY_GOAL.small}`;
+  $('bigbar').style.width = Math.min(100, e.big / ESSAY_GOAL.big * 100) + '%';
+  $('smallbar').style.width = Math.min(100, e.small / ESSAY_GOAL.small * 100) + '%';
 }
 function bumpEssay(which, delta) {
   const e = store.get('essays', { big: 0, small: 0 });
@@ -562,35 +895,322 @@ function bumpEssay(which, delta) {
   renderEssays();
 }
 
-/* ---------- 汇报 ---------- */
-document.getElementById('report').addEventListener('click', () => {
+/* ================= 计时器 ================= */
+const PRESETS = [['阅读单篇', 20], ['听力精听', 30], ['大作文', 40], ['小作文', 20], ['阅读整卷', 60]];
+let timerTotal = 20 * 60, timerLeft = timerTotal, timerId = null;
+function fmtT(s) { return `${pad(Math.floor(s/60))}:${pad(s%60)}`; }
+function drawTimer() {
+  const el = $('timerdisp');
+  el.textContent = fmtT(timerLeft);
+  el.className = 'timerdisp' + (timerId ? ' running' : '') + (timerLeft === 0 ? ' alarm' : '');
+}
+function setTimer(min) {
+  clearInterval(timerId); timerId = null;
+  timerTotal = timerLeft = Math.round(min * 60);
+  $('timerstart').textContent = '开始';
+  drawTimer();
+}
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7, 1.05, 1.6, 1.95].forEach(t => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 880; g.gain.setValueAtTime(.4, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + t + .3);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + .3);
+    });
+  } catch(e) {}
+}
+$('timerstart').addEventListener('click', () => {
+  if (timerId) { clearInterval(timerId); timerId = null; $('timerstart').textContent = '继续'; }
+  else {
+    if (timerLeft === 0) timerLeft = timerTotal;
+    timerId = setInterval(() => {
+      timerLeft--;
+      if (timerLeft <= 0) { timerLeft = 0; clearInterval(timerId); timerId = null; $('timerstart').textContent = '开始'; beep(); }
+      drawTimer();
+    }, 1000);
+    $('timerstart').textContent = '暂停';
+  }
+  drawTimer();
+});
+$('timerreset').addEventListener('click', () => setTimer(timerTotal / 60));
+const pbox = $('presets');
+PRESETS.forEach(([name, min], i) => {
+  const b = document.createElement('button');
+  b.textContent = `${name} ${min}′`;
+  if (i === 0) b.classList.add('on');
+  b.addEventListener('click', () => {
+    pbox.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    setTimer(min);
+  });
+  pbox.appendChild(b);
+});
+$('setcustom').addEventListener('click', () => {
+  const v = Number($('custommin').value);
+  if (v >= 1) { pbox.querySelectorAll('button').forEach(x => x.classList.remove('on')); setTimer(v); }
+});
+drawTimer();
+
+/* ================= 录音室 ================= */
+let idb = null;
+function db() {
+  return new Promise((res, rej) => {
+    if (idb) return res(idb);
+    const rq = indexedDB.open('ielts-coach', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('recs', { keyPath: 'id', autoIncrement: true });
+    rq.onsuccess = () => { idb = rq.result; res(idb); };
+    rq.onerror = () => rej(rq.error);
+  });
+}
+let mediaRec = null, recChunks = [], recStart = 0, recTick = null;
+async function listRecs() {
+  try {
+    const d = await db();
+    const tx = d.transaction('recs', 'readonly').objectStore('recs').getAll();
+    tx.onsuccess = () => {
+      const box = $('reclist');
+      box.innerHTML = '';
+      (tx.result || []).reverse().forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'rec';
+        const url = URL.createObjectURL(r.blob);
+        row.innerHTML = `<span class="lbl"><b>${r.label || '未命名'}</b><br><span style="color:var(--sub)">${r.date} · ${fmtT(r.dur || 0)}</span></span>
+          <audio controls src="${url}"></audio>
+          <button class="del">删</button>`;
+        row.querySelector('.del').addEventListener('click', async () => {
+          const d2 = await db();
+          d2.transaction('recs', 'readwrite').objectStore('recs').delete(r.id).onsuccess = listRecs;
+        });
+        box.appendChild(row);
+      });
+    };
+  } catch(e) {}
+}
+$('recbtn').addEventListener('click', async () => {
+  const btn = $('recbtn');
+  if (mediaRec && mediaRec.state === 'recording') {
+    mediaRec.stop();
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mime = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+    mediaRec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    recChunks = [];
+    mediaRec.ondataavailable = e => recChunks.push(e.data);
+    mediaRec.onstop = async () => {
+      clearInterval(recTick);
+      stream.getTracks().forEach(t => t.stop());
+      btn.classList.remove('on'); btn.textContent = '●';
+      const dur = Math.round((Date.now() - recStart) / 1000);
+      $('rectime').textContent = `已保存(${fmtT(dur)}),下面可回放`;
+      const blob = new Blob(recChunks, { type: mediaRec.mimeType || 'audio/webm' });
+      try {
+        const d = await db();
+        d.transaction('recs', 'readwrite').objectStore('recs')
+          .add({ date: todayKey, label: $('reclabel').value.trim(), blob, dur })
+          .onsuccess = listRecs;
+      } catch(e) {}
+      mediaRec = null;
+    };
+    mediaRec.start();
+    recStart = Date.now();
+    btn.classList.add('on'); btn.textContent = '■';
+    recTick = setInterval(() => {
+      $('rectime').textContent = `录音中 ${fmtT(Math.round((Date.now() - recStart) / 1000))} … 再点一下停止`;
+    }, 500);
+  } catch(e) {
+    $('rectime').textContent = '无法访问麦克风:请在浏览器设置里允许本站使用麦克风';
+  }
+});
+listRecs();
+
+/* ================= 口语题库 ================= */
+const BUILTIN_TOPICS = [
+  ['人物', '描述一位你敬佩的人'], ['人物', '描述一位有趣的老人'], ['人物', '描述一个擅长做饭的人'],
+  ['人物', '描述一个说服过你的朋友'], ['人物', '描述一个聪明的人'], ['人物', '描述一位爱旅行的朋友'],
+  ['地点', '描述一个想再去一次的城市'], ['地点', '描述一个安静的地方'], ['地点', '描述一个朋友的家'],
+  ['地点', '描述一座有趣的建筑'], ['地点', '描述一个靠水的地方'], ['地点', '描述一个你常去的公园'],
+  ['物品', '描述一件重要的礼物'], ['物品', '描述一件常用的电子产品'], ['物品', '描述一本对你有影响的书'],
+  ['物品', '描述一件你喜欢的衣服'], ['物品', '描述一张有意义的照片'], ['物品', '描述一件想买的东西'],
+  ['事件经历', '描述一次学会新技能的经历'], ['事件经历', '描述一次帮助别人的经历'], ['事件经历', '描述一次迟到的经历'],
+  ['事件经历', '描述一个收到好消息的时刻'], ['事件经历', '描述一个重要的决定'], ['事件经历', '描述一次克服困难的经历'],
+  ['事件经历', '描述一次难忘的旅行'], ['事件经历', '描述一次用外语交流的经历'],
+];
+const CATS = ['全部', '人物', '地点', '物品', '事件经历'];
+let curCat = '全部';
+function allTopics() {
+  const custom = store.get('customTopics', []);
+  return BUILTIN_TOPICS.concat(custom).map(([c, t]) => ({ c, t }));
+}
+function renderTopics() {
+  const cnt = store.get('topicCnt', {});
+  const box = $('topiclist');
+  box.innerHTML = '';
+  allTopics().filter(x => curCat === '全部' || x.c === curCat).forEach(x => {
+    const n = cnt[x.t] || 0;
+    const row = document.createElement('div');
+    row.className = 'topic';
+    row.innerHTML = `<span class="tt">${x.t} <span style="color:var(--sub);font-size:12px">· ${x.c}</span></span>
+      <span class="cnt ${n ? '' : 'zero'}">${n ? '练过' + n + '次' : '没练过'}</span>
+      <button class="mini">+1</button>`;
+    row.querySelector('.mini').addEventListener('click', () => {
+      const c2 = store.get('topicCnt', {});
+      c2[x.t] = (c2[x.t] || 0) + 1;
+      store.set('topicCnt', c2);
+      renderTopics();
+    });
+    box.appendChild(row);
+  });
+}
+const chipbox = $('catchips');
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.textContent = c;
+  if (c === '全部') b.classList.add('on');
+  b.addEventListener('click', () => {
+    curCat = c;
+    chipbox.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    renderTopics();
+  });
+  chipbox.appendChild(b);
+});
+CATS.slice(1).forEach(c => {
+  const o = document.createElement('option');
+  o.textContent = c;
+  $('newtopiccat').appendChild(o);
+});
+$('addtopic').addEventListener('click', () => {
+  const t = $('newtopic').value.trim();
+  if (!t) return;
+  const arr = store.get('customTopics', []);
+  arr.push([$('newtopiccat').value, t]);
+  store.set('customTopics', arr);
+  $('newtopic').value = '';
+  renderTopics();
+});
+$('drawbtn').addEventListener('click', () => {
+  const cnt = store.get('topicCnt', {});
+  const pool = allTopics().filter(x => curCat === '全部' || x.c === curCat);
+  if (!pool.length) return;
+  const minN = Math.min(...pool.map(x => cnt[x.t] || 0));
+  const fresh = pool.filter(x => (cnt[x.t] || 0) === minN);
+  const pick = fresh[Math.floor(Math.random() * fresh.length)];
+  $('drawtopic').textContent = `🎤 ${pick.t}`;
+  $('reclabel').value = pick.t;
+});
+renderTopics();
+
+/* ================= 句型库 ================= */
+function renderPhrases() {
+  const arr = store.get('phrases', []);
+  const box = $('phraselist');
+  box.innerHTML = '';
+  [...arr].reverse().forEach((p, ri) => {
+    const i = arr.length - 1 - ri;
+    const row = document.createElement('div');
+    row.className = 'phrase';
+    row.innerHTML = `<span class="tag">${p.tag}</span><span class="pt">${p.text}</span>
+      <button class="del" style="color:var(--red);background:none;border:none;cursor:pointer;font-size:13px">删</button>`;
+    row.querySelector('.del').addEventListener('click', () => {
+      const a = store.get('phrases', []);
+      a.splice(i, 1);
+      store.set('phrases', a);
+      renderPhrases();
+    });
+    box.appendChild(row);
+  });
+}
+$('addphrase').addEventListener('click', () => {
+  const t = $('newphrase').value.trim();
+  if (!t) return;
+  const arr = store.get('phrases', []);
+  arr.push({ text: t, tag: $('newphrasetag').value });
+  store.set('phrases', arr);
+  $('newphrase').value = '';
+  renderPhrases();
+});
+$('quizbtn').addEventListener('click', () => {
+  const arr = store.get('phrases', []);
+  if (arr.length < 3) { alert('句型库还不到3句,先去积累'); return; }
+  const picks = [...arr].sort(() => Math.random() - .5).slice(0, 3);
+  const box = $('quizbox');
+  box.style.display = 'block';
+  box.innerHTML = `<b>先合上眼默写这3类句型,再点开对照:</b><ol>` +
+    picks.map(p => `<li>【${p.tag}】<span style="filter:blur(5px);cursor:pointer" onclick="this.style.filter='none'">${p.text}</span> <span style="color:var(--sub);font-size:12px">(点击显示)</span></li>`).join('') + '</ol>';
+});
+renderPhrases();
+
+/* ================= 汇报 ================= */
+$('report').addEventListener('click', () => {
   const done = [], undone = [];
   plan.tasks.forEach((t, i) => (checks[i] ? done : undone).push(t.t));
   const scores = store.get('scores', []);
-  const recent = scores.slice(-6).map(s => `${s.date} ${s.type} ${s.band}${s.note ? '(' + s.note + ')' : ''}`).join('、') || '暂无';
+  const recent = scores.slice(-6).map(s => `${s.date.slice(5)} ${s.type} ${s.band}${s.note ? '(' + s.note + ')' : ''}`).join('、') || '暂无';
   const e = store.get('essays', { big: 0, small: 0 });
+  const errs = store.get('errors', []);
+  const todayErrs = errs.filter(x => x.date === todayKey);
+  const causes = {};
+  todayErrs.forEach(x => causes[x.cause] = (causes[x.cause] || 0) + 1);
   const days = Math.round((EXAM - today) / 86400000);
   const text = [
     `【雅思每日汇报】${todayKey}(距考试${days}天,阶段:${plan.phase})`,
     `✅ 已完成:${done.join('、') || '无'}`,
     `❌ 未完成:${undone.join('、') || '无'}`,
     `📊 近期分数:${recent}`,
+    `📕 今日错题:${todayErrs.length}道${todayErrs.length ? '(' + Object.entries(causes).map(([c, n]) => c + '×' + n).join(',') + ')' : ''}`,
     `✍️ 写作累计:大作文${e.big}/15,小作文${e.small}/8`,
     ``,
     `请根据以上情况:1)点评今天的执行 2)如果有分数变化,判断计划要不要调 3)告诉我明天最优先该做什么。有作文/口语录音转写我会贴在下面。`
   ].join('\n');
   navigator.clipboard.writeText(text).then(() => {
-    const c = document.getElementById('copied');
-    c.style.display = 'inline';
-    setTimeout(() => c.style.display = 'none', 2500);
+    $('copied').style.display = 'inline';
+    setTimeout(() => $('copied').style.display = 'none', 2500);
   });
 });
 
-/* ---------- 启动 ---------- */
+/* ================= 备份 ================= */
+const BK_KEYS_FIXED = ['scores', 'essays', 'errors', 'phrases', 'topicCnt', 'customTopics'];
+$('exportbtn').addEventListener('click', () => {
+  const data = { _v: 1, _exported: todayKey };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (BK_KEYS_FIXED.includes(k) || k.startsWith('chk:')) data[k] = store.get(k, null);
+  }
+  navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
+    $('exportok').style.display = 'inline';
+    setTimeout(() => $('exportok').style.display = 'none', 3000);
+  });
+});
+$('importbtn').addEventListener('click', () => {
+  let data;
+  try { data = JSON.parse($('importbox').value.trim()); } catch(e) { return alert('格式不对:请粘贴完整的导出文字'); }
+  if (!data || data._v !== 1) return alert('这不是本站导出的数据');
+  if (!confirm('导入会覆盖当前设备上的记录,确定吗?')) return;
+  Object.entries(data).forEach(([k, v]) => {
+    if (k.startsWith('_')) return;
+    store.set(k, v);
+  });
+  $('importok').style.display = 'inline';
+  checks = store.get(chkKey, []);
+  renderToday(); renderHeat(); renderScores(); renderEssays(); renderErrors(); renderTopics(); renderPhrases();
+  setTimeout(() => $('importok').style.display = 'none', 3000);
+});
+
+/* ================= 启动 ================= */
 renderToday();
 renderHeat();
 renderScores();
 renderEssays();
+renderErrors();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>

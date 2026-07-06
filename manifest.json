@@ -1,0 +1,11 @@
+{
+  "name": "雅思陪练",
+  "short_name": "雅思陪练",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#4f5ee3",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
