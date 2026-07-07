@@ -555,9 +555,11 @@ function planFor(d) {
   if (d < START) return { phase: '计划未开始', title: '', hint: '', tasks: [] };
 
   if (m === 7) {
-    if (day === 6) return {
-      phase: '7月 · 打底期', title: '第一晚:摸底',
-      hint: '今晚只做一件事:搞清楚自己现在站在哪。严格计时,不许暂停。',
+    // 只要还没录入过听力/阅读分数,摸底就一直是当晚的头等事(顺延不取消)
+    const noBaseline = !store.get('scores', []).some(s => s.type === '听力' || s.type === '阅读');
+    if (day === 6 || (noBaseline && day <= 12 && dow !== 0)) return {
+      phase: '7月 · 打底期', title: day === 6 ? '第一晚:摸底' : '补摸底(顺延,不取消)',
+      hint: '摸底没做,计划就没有锚点。今晚只做这一件事:搞清楚自己现在站在哪。严格计时,不许暂停。',
       tasks: [
         T('19:00-19:45', '听力摸底:剑12 T1', '4个section连做,只放一遍,30min+誊写', '摸底专用,做完别对细节,先出分'),
         T('19:45-20:45', '阅读摸底:剑12 T1', '3篇60min严格限时,到点就停', null),
