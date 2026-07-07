@@ -530,7 +530,11 @@ function julyChapter(d) {
   if (dd <= 26) return '第5章(核心场景词)';
   return '第11章(学术场景)';
 }
-const JULY_MOCK = { 12: '剑12 T2', 19: '剑12 T3', 26: '剑12 T4' };
+const JULY_MOCK = {
+  12: '剑12 第2套(Test 6) <a href="https://ielts.kmf.com/mock/pre/34" target="_blank" style="color:var(--accent)">在线做 →</a>',
+  19: '剑12 第3套(Test 7) <a href="https://ielts.kmf.com/mock/pre/46" target="_blank" style="color:var(--accent)">在线做 →</a>',
+  26: '剑12 第4套(Test 8) <a href="https://ielts.kmf.com/mock/pre/47" target="_blank" style="color:var(--accent)">在线做 →</a>'
+};
 /* 8.1-8.10 */
 function augListening(d) {
   const i = (d.getDate() - 1) * 2;
@@ -561,8 +565,8 @@ function planFor(d) {
       phase: '7月 · 打底期', title: day === 6 ? '第一晚:摸底' : '补摸底(顺延,不取消)',
       hint: '摸底没做,计划就没有锚点。今晚只做这一件事:搞清楚自己现在站在哪。严格计时,不许暂停。',
       tasks: [
-        T('19:00-19:45', '听力摸底:剑12 T1', '4个section连做,只放一遍,30min+誊写', '摸底专用,做完别对细节,先出分'),
-        T('19:45-20:45', '阅读摸底:剑12 T1', '3篇60min严格限时,到点就停', null),
+        T('19:00-19:45', '听力摸底:剑12 T1', '4个section连做,只放一遍,30min+誊写', '<a href="https://ielts.kmf.com/mock/pre/33" target="_blank" style="color:var(--accent)">考满分在线做剑12第一套(Test 5),点这里直接开始 →</a>'),
+        T('19:45-20:45', '阅读摸底:剑12 T1', '3篇60min严格限时,到点就停(同一入口接着做)', null),
         T('20:45-21:15', '对答案+换算', '分数录入"记录"页,发给Claude定7月配比', null),
         T('21:15-22:00', '浏览错题', '只看错在哪,不精读,明天开始正式训练', null),
       ]
